@@ -45,3 +45,13 @@ jobs:
         region: westeurope
         template: ./Network/DeployVPN.bicep
         deploymentMode: incremental
+    
+    - name: Deploy Citrix Cloud Connectors
+      uses: azure/arm-deploy@v1
+      with:
+        scope: resourcegroup
+        resourceGroupName: rg-bicep-citrix-vm-001
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        region: westeurope
+        template: ./VirtualMachine/DeployCCCVM.bicep
+        deploymentMode: incremental       
