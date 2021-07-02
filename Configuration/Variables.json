@@ -1,0 +1,102 @@
+{
+    "location": "WestEurope",
+    "ResourceGroups": [
+        "rg-pwsh-sharedservices-network-001",
+        "rg-pwsh-sharedservices-vm-001",
+        "rg-pwsh-citrix-network-001",
+        "rg-pwsh-citrix-vm-001",
+        "rg-pwsh-citrix-workers-001"
+    ],
+    "SharedService_vNet": [
+        {
+            "ResourceGroup": "rg-pwsh-sharedservices-network-001",
+            "Name": "vnet-pwsh-sharedservices-001",
+            "vNetPrefix": "172.16.0.0/16",
+            "Subnets": [
+                {
+                    "SubnetName": "GatewaySubnet",
+                    "SubnetPrefix": "172.16.0.0/26"
+                },
+                {
+                    "SubnetName": "snet-sharedservices-adds-001",
+                    "SubnetPrefix": "172.16.0.64/26"
+                }
+            ],
+            "vNetDNSServers": ["192.168.10.10","192.168.10.11"]
+        }
+    ],
+    "Citrix_vNet": [
+        {
+            "ResourceGroup": "rg-pwsh-citrix-network-001",
+            "Name": "vnet-pwsh-citrix-001",
+            "vNetPrefix": "172.17.0.0/16",
+            "Subnets": [
+                {
+                    "SubnetName": "snet-citrix-vm-001",
+                    "SubnetPrefix": "172.17.0.0/26"
+                },
+                {
+                    "SubnetName": "snet-citrix-workers-001",
+                    "SubnetPrefix": "172.17.1.0/24"
+                },
+                {
+                    "SubnetName": "snet-citrix-workers-002",
+                    "SubnetPrefix": "172.17.2.0/24"
+                }
+            ],
+            "vNetDNSServers": ["192.168.10.10","192.168.10.11"]
+        }
+    ],
+    "VPN": [
+        {
+            "VirtualNetworkGateway": [
+                {
+                    "virtualNetworkGatewayName": "vng-sharedservices-001",
+                    "VirtualNetworkName": "vnet-pwsh-sharedservices-001",
+                    "SubnetName": "GatewaySubnet",
+                    "sku": "Basic",
+                    "ResourceGroup": "rg-pwsh-sharedservices-network-001",
+                    "PublicIpAddressName": "pip-vng-sharedservices-001",
+                    "gatewayType": "Vpn",
+                    "enableBGP": false
+                }
+            ],
+            "LocalNetworkGateway": [
+                {
+                    "ResourceGroup": "rg-pwsh-sharedservices-network-001",
+                    "LocalAddressPrefixes": ["192.168.1.0/24","192.168.10.0/24"],
+                    "LocalGatewayPublicIP": "80.80.80.80",
+                    "LocalGatewayName": "lng-sharedservices-001"
+                }
+            ], 
+            "Connection": [
+                {
+                    "ResourceGroup": "rg-pwsh-sharedservices-network-001",
+                    "connectionName": "cnt-sharedservices-001",
+                    "connectionType": "IPSec",
+                    "enableBgp": false,
+                    "sharedKey": "InsertVPNSecret"
+                }
+            ]
+        }
+    ],      
+    "CloudConnectors": {
+        "availabilitySetName": "as-citrix-001",
+        "availabilitySetPlatformFaultDomainCount": 2,
+        "availabilitySetPlatformUpdateDomainCount": 5,
+        "CCVMPrefix": "vm-ctx-cc",
+        "domainFQDN": "domain.com",
+        "domainJoinUserName": "domainjoin",
+        "domainJoinUserPassword": "InsertPassword",
+        "ResourceGroup": "rg-pwsh-citrix-vm-001",
+        "OS": "Server2019",
+        "ouPath": "InsertOUPath",
+        "SubnetName": "snet-citrix-vm-001",
+        "virtualMachineCount": 2,
+        "VMPassword": "InsertPassword",
+        "VMSize": "Standard_B2ms",
+        "VMUserName": "azureadmin",
+        "vNetName": "vnet-pwsh-citrix-001",
+        "vNetResourceGroup": "rg-pwsh-citrix-network-001"
+    }
+}

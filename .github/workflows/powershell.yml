@@ -1,0 +1,46 @@
+name: PowerShell Deployment
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    paths:
+      - '**powershell.yml'
+      - 'Tests/PowerShellScripts.tests.ps1'
+      - '**.ps1'
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Perform a Pester tests from the tests folder
+      shell: pwsh
+      run: |
+        Invoke-Pester -Passthru
+  
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS_BLOGSERIES }}
+        enable-AzPSSession: true 
+
+    - name: Install bicep
+      shell: bash
+      run: | 
+        curl -Lo bicepinstall https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+        chmod +x ./bicepinstall
+        sudo mv ./bicepinstall /usr/local/bin/bicep
+        bicep --help
+
+    - name: Deploy landing zone
+      uses: azure/powershell@v1
+      with:
+        inlineScript: ./Scripts/DeployEnvironment.ps1
+        azPSVersion: "latest"
